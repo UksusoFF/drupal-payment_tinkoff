@@ -20,7 +20,7 @@ You will get "Terminal key", "Password" and other settings for your payment syst
 6. Go to `/admin/config/services/payment/method/add` and add Tinkoff payment method.
 7. Setup the settings according your data from Tinkoff.
 
-#Additional information
+# Additional information
 Default Process (IPN) URL: https://yoursitename.com/tinkoff/process
 Default Success URL: https://yoursitename.com/tinkoff/success
 Default Fail URL: https://yoursitename.com/tinkoff/fail
