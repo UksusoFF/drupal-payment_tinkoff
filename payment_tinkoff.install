@@ -1,0 +1,38 @@
+<?php
+
+/**
+ * @file
+ * Installation and uninstallation functions.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function payment_tinkoff_schema()
+{
+  $schema['payment_tinkoff'] = [
+    'fields' => [
+      'pmid' => [
+        'type' => 'int',
+        'unsigned' => true,
+        'not null' => true,
+        'default' => 0,
+      ],
+      'TerminalLogin' => [
+        'type' => 'varchar',
+        'length' => 255,
+      ],
+      'TerminalPass' => [
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => true,
+      ],
+    ],
+    'primary key' => ['pmid'],
+    'unique keys' => [
+      'pmid' => ['pmid'],
+    ],
+  ];
+
+  return $schema;
+}

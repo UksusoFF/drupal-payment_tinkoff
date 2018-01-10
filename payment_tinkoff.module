@@ -1,0 +1,303 @@
+<?php
+/**
+ * @file
+ * Contains hook implementations and global functions.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function payment_tinkoff_menu()
+{
+  $items['tinkoff/redirect/%entity_object'] = [
+    'load arguments' => ['payment'],
+    'title' => 'Go to payment server',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => ['payment_tinkoff_form_redirect', 2],
+    'access callback' => 'payment_tinkoff_form_redirect_access',
+    'access arguments' => [2],
+    'type' => MENU_CALLBACK,
+  ];
+
+  $items['tinkoff/process'] = [
+    'title' => 'Process',
+    'load arguments' => ['payment_method'],
+    'page callback' => 'payment_tinkoff_process_callback',
+    'access callback' => true,
+    'type' => MENU_CALLBACK,
+  ];
+
+  $items['tinkoff/success'] = [
+    'title' => 'Success',
+    'load arguments' => ['payment_method'],
+    'page callback' => 'payment_tinkoff_success',
+    'access callback' => true,
+    'type' => MENU_CALLBACK,
+  ];
+
+  $items['tinkoff/fail'] = [
+    'title' => 'Fail',
+    'load arguments' => ['payment_method'],
+    'page callback' => 'payment_tinkoff_fail',
+    'access callback' => true,
+    'type' => MENU_CALLBACK,
+  ];
+
+  return $items;
+}
+
+/**
+ * Return page callback for success payment status.
+ */
+function payment_tinkoff_success()
+{
+  //TODO: Chech uc_cart_empty exists. See for details: https://www.drupal.org/node/2866042
+  uc_cart_empty(uc_cart_get_id());
+  return t('Payment has been success'); //TODO: Fix in robokassa module.
+}
+
+/**
+ * Return page callback for error payment status.
+ */
+function payment_tinkoff_fail()
+{
+  payment_tinkoff_process_callback(false);
+  return t('Payment has been failed');
+}
+
+/**
+ * Processes an IPN request based on POST data.
+ *
+ * @param bool $is_result
+ *   Fallback call flag.
+ */
+function payment_tinkoff_process_callback($is_result = true)
+{
+  $post_data = $_POST;
+  if (!TinkoffPaymentController::validatePost($post_data)) {
+    print 'bad data';
+    drupal_exit();
+  }
+
+  $payment = entity_load_single('payment', $post_data['InvId']);
+  if (!$payment) {
+    print 'bad data';
+    drupal_exit();
+  }
+
+  $result_status = $is_result ? PAYMENT_STATUS_SUCCESS : PAYMENT_STATUS_FAILED;
+  $payment->setStatus(new PaymentStatusItem($result_status));
+  entity_save('payment', $payment);
+
+  if ($is_result) {
+    print 'OK' . $payment->pid;
+    drupal_exit();
+  }
+}
+
+/**
+ * Form build callback: the redirect form.
+ *
+ * @param array $form
+ *   Form.
+ * @param array $form_state
+ *   Form state.
+ * @param Payment $payment
+ *   Payment object.
+ *
+ * @return array
+ *   Payment form array.
+ */
+function payment_tinkoff_form_redirect(array $form, array &$form_state, Payment $payment)
+{
+  $form = TinkoffPaymentController::getPaymentForm($payment);
+  $form['#attached']['js'] = [
+    drupal_get_path('module', 'payment_tinkoff') . '/redirect_autosubmit.js',
+  ];
+  $form['#prefix'] = '<div class="payment-tinkoff-redirect-form">';
+  $form['#suffix'] = '</div>';
+  $form['#pre_render'][] = '_payment_tinkoff_clean_form';
+  $form['message'] = [
+    '#type' => 'markup',
+    '#markup' => '<p>' . t('You will be redirected to the off-site payment server to authorize the payment.') . '</p>',
+  ];
+  return $form;
+}
+
+/**
+ * Cleanup external redirect form.
+ *
+ * @param array $form
+ *   Form for cleanup.
+ *
+ * @return array
+ *   Cleaned form.
+ */
+function _payment_tinkoff_clean_form(array $form)
+{
+  unset($form['form_token']);
+  unset($form['form_build_id']);
+  unset($form['form_id']);
+  return $form;
+}
+
+/**
+ * Access callback for the redirect page.
+ *
+ * @param Payment $payment
+ *   The payment to check access to.
+ * @param object $account
+ *   An optional user to check access for. If NULL, then the currently logged
+ *   in user is used.
+ *
+ * @return bool
+ *   TRUE if access allowed FALSE otherwise.
+ */
+function payment_tinkoff_form_redirect_access(Payment $payment, $account = null)
+{
+  if (!$account) {
+    global $user;
+    $account = $user;
+  }
+  return $account->uid == $payment->uid &&
+    is_a($payment->method->controller, 'TinkoffPaymentController')
+    && payment_status_is_or_has_ancestor($payment->getStatus()->status, PAYMENT_STATUS_PENDING);
+}
+
+/**
+ * Implements hook_payment_method_controller_info().
+ */
+function payment_tinkoff_payment_method_controller_info()
+{
+  return ['TinkoffPaymentController'];
+}
+
+/**
+ * Implements hook_entity_load().
+ */
+function payment_tinkoff_entity_load(array $entities, $entity_type)
+{
+  if ($entity_type == 'payment_method') {
+    $pmids = [];
+    foreach ($entities as $payment_method) {
+      if ($payment_method->controller->name == 'TinkoffPaymentController') {
+        $pmids[] = $payment_method->pmid;
+      }
+    }
+    if ($pmids) {
+      $query = db_select('payment_tinkoff')
+        ->fields('payment_tinkoff')
+        ->condition('pmid', $pmids);
+      $result = $query->execute();
+      while ($data = $result->fetchAssoc()) {
+        $payment_method = $entities[$data['pmid']];
+        $payment_method->controller_data = (array)$data;
+        unset($payment_method->controller_data['pmid']);
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_ACTION().
+ */
+function payment_tinkoff_payment_method_insert(PaymentMethod $payment_method)
+{
+  if ($payment_method->controller->name == 'TinkoffPaymentController') {
+    $payment_method->controller_data += $payment_method->controller->controller_data_defaults;
+    $values = array_merge($payment_method->controller_data, [
+      'pmid' => $payment_method->pmid,
+    ]);
+    $query = db_insert('payment_tinkoff')
+      ->fields($values);
+    $query->execute();
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_ACTION().
+ */
+function payment_tinkoff_payment_method_update(PaymentMethod $payment_method)
+{
+  if ($payment_method->controller->name == 'TinkoffPaymentController') {
+    $query = db_update('payment_tinkoff');
+    $values = array_merge($payment_method->controller_data, [
+      'pmid' => $payment_method->pmid,
+    ]);
+    $query->fields($values);
+    $query->condition('pmid', $payment_method->pmid);
+    $query->execute();
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_ACTION().
+ */
+function payment_tinkoff_payment_method_delete($entity)
+{
+  if ($entity->controller->name == 'TinkoffPaymentController') {
+    db_delete('payment_tinkoff')
+      ->condition('pmid', $entity->pmid)
+      ->execute();
+  }
+}
+
+/**
+ * Payment method configuration form elements callback.
+ *
+ * Implements
+ * PaymentMethodController::payment_method_configuration_form_elements_callback.
+ *
+ * @return array
+ *   A Drupal form.
+ */
+function payment_tinkoff_payment_method_configuration_form_elements(array $form, array &$form_state)
+{
+  $payment_method = $form_state['payment_method'];
+  $controller = $payment_method->controller;
+  $controller_data = $payment_method->controller_data + $controller->controller_data_defaults;
+
+  $elements['TerminalLogin'] = [
+    '#type' => 'textfield',
+    '#title' => t('Terminal login'),
+    '#description' => t('Your Tinkoff terminal login'),
+    '#default_value' => $controller_data['TerminalLogin'],
+    '#required' => true,
+  ];
+
+  $elements['TerminalPass'] = [
+    '#type' => 'textfield',
+    '#title' => t('Terminal password'),
+    '#description' => t('Your Tinkoff terminal password'),
+    '#default_value' => $controller_data['TerminalPass'],
+    '#required' => true,
+  ];
+
+  return $elements;
+}
+
+/**
+ * Form validate callback.
+ *
+ * Implements form validate callback for
+ * interkassa_payment_payment_method_configuration_form_elements().
+ */
+function payment_tinkoff_payment_method_configuration_form_elements_validate(array $element, array &$form_state)
+{
+  $values = drupal_array_get_nested_value($form_state['values'], $element['#parents']);
+  $controller_data = &$form_state['payment_method']->controller_data;
+  $controller_data['TerminalLogin'] = $values['TerminalLogin'];
+  $controller_data['TerminalPass'] = $values['TerminalPass'];
+}
+
+/**
+ * Payment configuration form elements callback.
+ *
+ * Implements
+ * PaymentMethodController::payment_configuration_form_elements_callback.
+ */
+function payment_tinkoff_payment_configuration_form_elements(array $element, array &$form_state)
+{
+  $elements = [];
+  return $elements;
+}

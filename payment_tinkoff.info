@@ -1,0 +1,9 @@
+name = Tinkoff Payment Method
+description = Tinkoff Payment Method.
+core = 7.x
+version = "7.x-1.0"
+dependencies[] = payment
+package = Payment
+
+files[] = includes/TinkoffMerchantAPI.inc
+files[] = includes/TinkoffPaymentController.inc
