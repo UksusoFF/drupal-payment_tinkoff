@@ -21,8 +21,8 @@ You will get "Terminal key", "Password" and other settings for your payment syst
 7. Setup the settings according your data from Tinkoff.
 
 # Additional information
-Default Process (IPN) URL: https://yoursitename.com/tinkoff/process
-Default Success URL: https://yoursitename.com/tinkoff/success
-Default Fail URL: https://yoursitename.com/tinkoff/fail
+* Default Process (IPN) URL: https://yoursitename.com/tinkoff/process
+* Default Success URL: https://yoursitename.com/tinkoff/success
+* Default Fail URL: https://yoursitename.com/tinkoff/fail
 
 More API documentation can be found at [Tinkoff API](https://oplata.tinkoff.ru/landing/develop/documentation).
