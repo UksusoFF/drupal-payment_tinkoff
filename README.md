@@ -16,8 +16,8 @@ You will get "Terminal key", "Password" and other settings for your payment syst
 2. Upload the downloaded file to your webserver.
 3. Unzip the package into your `drupal/sites/all/modules/` directory.
 4. Rename the folder to `payment_tinkoff`.
-5. Go to `admin/modules` and enable module.
-6. Go to `/admin/config/services/payment/method/add` and add Tinkoff payment method.
+5. Go to `https://yoursitename.com/admin/modules` and enable module.
+6. Go to `https://yoursitename.com/admin/config/services/payment/method/add` and add Tinkoff payment method.
 7. Setup the settings according your data from Tinkoff.
 
 # Additional information
