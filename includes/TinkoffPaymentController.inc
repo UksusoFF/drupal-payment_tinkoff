@@ -87,7 +87,7 @@ class TinkoffPaymentController extends PaymentMethodController
    */
   static public function validatePost(array $data, $is_interaction = true)
   {
-    watchdog('payment_tinkoff', json_encode($data), [], WATCHDOG_DEBUG);
+    watchdog('payment_tinkoff', json_encode($data), [], WATCHDOG_WARNING);
 
     // Exit now if the $_POST was empty.
     if (empty($data)) {
