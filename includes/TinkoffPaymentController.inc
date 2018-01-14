@@ -60,10 +60,9 @@ class TinkoffPaymentController extends PaymentMethodController
    */
   static public function getPaymentForm(Payment $payment)
   {
-    $form = [];
     $settings = $payment->method->controller_data;
 
-    $tinkoff = new TinkoffMerchantAPI($settings['TerminalLogin'], $settings['TerminalPassword'], self::SERVER_URL);
+    $tinkoff = new TinkoffMerchantAPI($settings['TerminalLogin'], $settings['TerminalPass'], self::SERVER_URL);
 
     $request = json_decode($tinkoff->buildQuery('Init', [
       'OrderId'  => $payment->pid,
@@ -71,9 +70,9 @@ class TinkoffPaymentController extends PaymentMethodController
       'DATA'	   => 'Description=' . drupal_substr($payment->description, 0, 64) . '|connection_type=drupal7ubercart'
     ]));
 
-    $form['#action'] = $request->PaymentURL;
-
-    return $form;
+    return [
+      '#action' => $request->PaymentURL,
+    ];
   }
 
   /**
