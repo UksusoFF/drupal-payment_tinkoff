@@ -51,7 +51,7 @@ function payment_tinkoff_menu()
  */
 function payment_tinkoff_success()
 {
-  //TODO: Chech uc_cart_empty exists. See for details: https://www.drupal.org/node/2866042
+  //TODO: Check uc_cart_empty exists. See for details: https://www.drupal.org/node/2866042
   uc_cart_empty(uc_cart_get_id());
   return t('Payment has been success'); //TODO: Fix in robokassa module.
 }
@@ -74,16 +74,13 @@ function payment_tinkoff_fail()
 function payment_tinkoff_process_callback($is_result = true)
 {
   $post_data = $_POST;
+
   if (!TinkoffPaymentController::validatePost($post_data)) {
     print 'bad data';
     drupal_exit();
   }
 
-  $payment = entity_load_single('payment', $post_data['InvId']);
-  if (!$payment) {
-    print 'bad data';
-    drupal_exit();
-  }
+  $payment = entity_load_single('payment', $post_data['OrderId']);
 
   $result_status = $is_result ? PAYMENT_STATUS_SUCCESS : PAYMENT_STATUS_FAILED;
   $payment->setStatus(new PaymentStatusItem($result_status));

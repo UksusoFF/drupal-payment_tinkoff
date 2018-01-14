@@ -11,7 +11,7 @@
  * @link     http://tinkoff.ru
  */
 //namespace Tinkoff;
- 
+
 //use HttpException;
 
 /**
@@ -300,7 +300,6 @@ class TinkoffMerchantAPI
         }
         Debug::trace($args);
         if ($curl = curl_init()) {
-
             curl_setopt($curl, CURLOPT_URL, $api_url);
             curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
@@ -308,8 +307,8 @@ class TinkoffMerchantAPI
             curl_setopt($curl, CURLOPT_POST, true);
             curl_setopt($curl, CURLOPT_POSTFIELDS, $args);
             $out = curl_exec($curl);
-            $this->_response = $out;
 
+            $this->_response = $out;
             $json = json_decode($out);
             if ($json) {
                 if (@$json->ErrorCode !== "0") {
