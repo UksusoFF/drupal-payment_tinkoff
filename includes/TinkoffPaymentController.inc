@@ -109,7 +109,7 @@ class TinkoffPaymentController extends PaymentMethodController
       return false;
     }
 
-    if ($data['Status'] !== 'CONFIRMED' || $data['ErrorCode'] !== '0') {
+    if (!in_array($data['Status'], ['CONFIRMED', 'AUTHORIZED']) || $data['ErrorCode'] !== '0') {
       watchdog('payment_tinkoff', 'Wrong payment status. POST data: <pre>!data</pre>', [
         '!data' => print_r($data, true),
       ], WATCHDOG_WARNING);

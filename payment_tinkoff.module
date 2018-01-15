@@ -61,17 +61,14 @@ function payment_tinkoff_success()
  */
 function payment_tinkoff_fail()
 {
-  payment_tinkoff_process_callback(false);
+  payment_tinkoff_process_callback();
   return t('Payment has been failed');
 }
 
 /**
  * Processes an IPN request based on POST data.
- *
- * @param bool $is_result
- *   Fallback call flag.
  */
-function payment_tinkoff_process_callback($is_result = true)
+function payment_tinkoff_process_callback()
 {
   $post_data = $_POST;
 
@@ -82,14 +79,22 @@ function payment_tinkoff_process_callback($is_result = true)
 
   $payment = entity_load_single('payment', $post_data['OrderId']);
 
-  $result_status = $is_result ? PAYMENT_STATUS_SUCCESS : PAYMENT_STATUS_FAILED;
-  $payment->setStatus(new PaymentStatusItem($result_status));
+  switch ($post_data['Status']) {
+    case 'AUTHORIZED':
+      $payment->setStatus(new PaymentStatusItem(PAYMENT_STATUS_PENDING));
+      break;
+    case 'CONFIRMED':
+      $payment->setStatus(new PaymentStatusItem(PAYMENT_STATUS_SUCCESS));
+      break;
+    default:
+      $payment->setStatus(new PaymentStatusItem(PAYMENT_STATUS_FAILED));
+      break;
+  }
+
   entity_save('payment', $payment);
 
-  if ($is_result) {
-    print 'OK' . $payment->pid;
-    drupal_exit();
-  }
+  print 'OK' . $payment->pid;
+  drupal_exit();
 }
 
 /**
