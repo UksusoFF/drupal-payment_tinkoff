@@ -133,7 +133,7 @@ class TinkoffPaymentController extends PaymentMethodController
       return false;
     }
 
-    if ($payment->totalAmount(true) != ($data['OutSum'] / 100)) {
+    if ($payment->totalAmount(true) != ((int)$data['Amount'] / 100)) {
       watchdog('payment_tinkoff', 'Wrong payment amount. POST data: !data', [
         '!data' => print_r($data, true),
       ], WATCHDOG_WARNING);
