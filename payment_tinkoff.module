@@ -28,17 +28,17 @@ function payment_tinkoff_menu()
   ];
 
   $items['payment_tinkoff/success'] = [
-    'title' => 'Success',
+    'title' => 'Payment was successful',
     'load arguments' => ['payment_method'],
-    'page callback' => 'payment_tinkoff_success',
+    'page callback' => 'payment_tinkoff_success_callback',
     'access callback' => true,
     'type' => MENU_CALLBACK,
   ];
 
   $items['payment_tinkoff/fail'] = [
-    'title' => 'Fail',
+    'title' => 'Payment was not successful',
     'load arguments' => ['payment_method'],
-    'page callback' => 'payment_tinkoff_fail',
+    'page callback' => 'payment_tinkoff_fail_callback',
     'access callback' => true,
     'type' => MENU_CALLBACK,
   ];
@@ -49,20 +49,23 @@ function payment_tinkoff_menu()
 /**
  * Return page callback for success payment status.
  */
-function payment_tinkoff_success()
+function payment_tinkoff_success_callback()
 {
-  //TODO: Check uc_cart_empty exists. See for details: https://www.drupal.org/node/2866042
-  uc_cart_empty(uc_cart_get_id());
-  return t('Payment has been success'); //TODO: Fix in robokassa module.
+  if (function_exists('uc_cart_empty')) {
+    uc_cart_empty(uc_cart_get_id());
+  }
+
+  return t('Thank you! Your payment was successful.');
 }
 
 /**
  * Return page callback for error payment status.
  */
-function payment_tinkoff_fail()
+function payment_tinkoff_fail_callback()
 {
-  payment_tinkoff_process_callback();
-  return t('Payment has been failed');
+  return t('Your payment was not successful. Please <a href="/cart">try again</a> or contact us at <a href="mailto:!email">!email</a>.', [
+    '!email' => variable_get('site_mail'),
+  ]);
 }
 
 /**
