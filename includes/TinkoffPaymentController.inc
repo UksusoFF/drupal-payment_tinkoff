@@ -46,7 +46,7 @@ class TinkoffPaymentController extends PaymentMethodController
   public function execute(Payment $payment)
   {
     entity_save('payment', $payment);
-    drupal_goto('tinkoff/redirect/' . $payment->pid);
+    drupal_goto('payment_tinkoff/redirect/' . $payment->pid);
   }
 
   /**

@@ -9,7 +9,7 @@
  */
 function payment_tinkoff_menu()
 {
-  $items['tinkoff/redirect/%entity_object'] = [
+  $items['payment_tinkoff/redirect/%entity_object'] = [
     'load arguments' => ['payment'],
     'title' => 'Go to payment server',
     'page callback' => 'drupal_get_form',
@@ -19,7 +19,7 @@ function payment_tinkoff_menu()
     'type' => MENU_CALLBACK,
   ];
 
-  $items['tinkoff/process'] = [
+  $items['payment_tinkoff/process'] = [
     'title' => 'Process',
     'load arguments' => ['payment_method'],
     'page callback' => 'payment_tinkoff_process_callback',
@@ -27,7 +27,7 @@ function payment_tinkoff_menu()
     'type' => MENU_CALLBACK,
   ];
 
-  $items['tinkoff/success'] = [
+  $items['payment_tinkoff/success'] = [
     'title' => 'Success',
     'load arguments' => ['payment_method'],
     'page callback' => 'payment_tinkoff_success',
@@ -35,7 +35,7 @@ function payment_tinkoff_menu()
     'type' => MENU_CALLBACK,
   ];
 
-  $items['tinkoff/fail'] = [
+  $items['payment_tinkoff/fail'] = [
     'title' => 'Fail',
     'load arguments' => ['payment_method'],
     'page callback' => 'payment_tinkoff_fail',
