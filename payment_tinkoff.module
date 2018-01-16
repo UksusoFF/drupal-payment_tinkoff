@@ -51,7 +51,8 @@ function payment_tinkoff_menu()
  */
 function payment_tinkoff_success_callback()
 {
-  watchdog('payment_tinkoff', json_encode(drupal_get_query_parameters()), [], WATCHDOG_WARNING);
+  //Payment ID + 1?
+  //0.00 in admin
 
   if (function_exists('uc_cart_empty')) {
     //This must be in payment_ubercart module. See: https://www.drupal.org/project/payment_ubercart/issues/2866042
@@ -92,6 +93,8 @@ function payment_tinkoff_process_callback()
   }
 
   $payment = entity_load_single('payment', $post_data['OrderId']);
+
+  watchdog('payment_tinkoff', json_encode($payment), [], WATCHDOG_WARNING);
 
   switch ($post_data['Status']) {
     case 'AUTHORIZED':
