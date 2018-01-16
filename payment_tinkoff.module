@@ -98,8 +98,8 @@ function payment_tinkoff_process_callback()
     case 'CONFIRMED':
       $payment->setStatus(new PaymentStatusItem(PAYMENT_STATUS_SUCCESS));
       break;
-    default:
-      $payment->setStatus(new PaymentStatusItem(PAYMENT_STATUS_FAILED));
+    case 'REJECTED':
+      $payment->setStatus(new PaymentStatusItem(PAYMENT_STATUS_CANCELLED));
       break;
   }
 
@@ -286,6 +286,8 @@ function payment_tinkoff_payment_method_configuration_form_elements(array $form,
     '#default_value' => $controller_data['TerminalPass'],
     '#required' => true,
   ];
+
+  //TODO: Add testing terminal support.
 
   return $elements;
 }
