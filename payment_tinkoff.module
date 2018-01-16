@@ -31,6 +31,7 @@ function payment_tinkoff_menu()
     'title' => 'Payment was successful',
     'load arguments' => ['payment_method'],
     'page callback' => 'payment_tinkoff_success_callback',
+    'page arguments' => [1],
     'access callback' => true,
     'type' => MENU_CALLBACK,
   ];
@@ -39,6 +40,7 @@ function payment_tinkoff_menu()
     'title' => 'Payment was not successful',
     'load arguments' => ['payment_method'],
     'page callback' => 'payment_tinkoff_fail_callback',
+    'page arguments' => [1],
     'access callback' => true,
     'type' => MENU_CALLBACK,
   ];
@@ -49,9 +51,13 @@ function payment_tinkoff_menu()
 /**
  * Return page callback for success payment status.
  */
-function payment_tinkoff_success_callback()
+function payment_tinkoff_success_callback($data)
 {
+  watchdog('payment_tinkoff', json_encode($data), [], WATCHDOG_WARNING);
+  //TODO: Strip data https://example.ru/uc_tinkoff/success?Success=true&ErrorCode=0&Message=None&Details=&Amount=&MerchantEmail=&MerchantName=&OrderId=&PaymentId=&TranDate=&BackUrl=&CompanyName=&EmailReq=&PhonesReq=
+
   if (function_exists('uc_cart_empty')) {
+    //This must be in payment_ubercart module. See: https://www.drupal.org/project/payment_ubercart/issues/2866042
     uc_cart_empty(uc_cart_get_id());
   }
 
@@ -61,8 +67,10 @@ function payment_tinkoff_success_callback()
 /**
  * Return page callback for error payment status.
  */
-function payment_tinkoff_fail_callback()
+function payment_tinkoff_fail_callback($data)
 {
+  watchdog('payment_tinkoff', json_encode($data), [], WATCHDOG_WARNING);
+
   return t('Your payment was not successful. Please <a href="/cart">try again</a> or contact us at <a href="mailto:!email">!email</a>.', [
     '!email' => variable_get('site_mail'),
   ]);
