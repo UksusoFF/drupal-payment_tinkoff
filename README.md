@@ -5,7 +5,7 @@ This module provide integration [Tinkoff](https://oplata.tinkoff.ru/) payments f
 
 Module based on [Robokassa Payment](https://www.drupal.org/project/robokassa_payment) integration and [Tinkoff Ubercart](https://oplata.tinkoff.ru/landing/develop/cms/ubercart) modules.
 
-Tested on Ubercart only. If you have any questions feel free to create new issue.
+**Tested on Ubercart only.** If you have any questions feel free to [create new issue](https://github.com/UksusoFF/drupal-payment_tinkoff/issues/new).
 
 # Registering with Tinkoff
 Before you start the installation process you must register on https://oplata.tinkoff.ru/ and create your own merchant.
