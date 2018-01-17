@@ -1,10 +1,11 @@
 # Drupal Payment Tinkoff
 ![Drupal Payment Tinkoff](https://img.shields.io/badge/Drupal-7.x-blue.svg)
 
-# Warning! Currently module has WIP status. Not usable for production!
 This module provide integration [Tinkoff](https://oplata.tinkoff.ru/) payments for using with Drupal Ubercart / Commerce through [Payment](https://www.drupal.org/project/payment) (7.x-1.x version) module.
 
 Module based on [Robokassa Payment](https://www.drupal.org/project/robokassa_payment) integration and [Tinkoff Ubercart](https://oplata.tinkoff.ru/landing/develop/cms/ubercart) modules.
+
+Tested on Ubercart only. If you have any questions feel free to create new issue.
 
 # Registering with Tinkoff
 Before you start the installation process you must register on https://oplata.tinkoff.ru/ and create your own merchant.
@@ -26,3 +27,6 @@ You will get "Terminal key", "Password" and other settings for your payment syst
 * Default Fail URL: https://yoursitename.com/payment_tinkoff/fail
 
 More API documentation can be found at [Tinkoff API](https://oplata.tinkoff.ru/landing/develop/documentation).
+
+# Additional information
+* Add switch between testing and release terminals.

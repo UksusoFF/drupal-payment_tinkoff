@@ -287,8 +287,6 @@ function payment_tinkoff_payment_method_configuration_form_elements(array $form,
     '#required' => true,
   ];
 
-  //TODO: Add testing terminal support.
-
   return $elements;
 }
 
