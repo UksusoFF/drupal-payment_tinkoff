@@ -105,7 +105,7 @@ function payment_tinkoff_process_callback()
 
   entity_save('payment', $payment);
 
-  print 'OK' . $payment->pid;
+  print 'OK';
   drupal_exit();
 }
 
