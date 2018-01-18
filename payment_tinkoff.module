@@ -99,6 +99,11 @@ function payment_tinkoff_process_callback()
       $payment->setStatus(new PaymentStatusItem(PAYMENT_STATUS_SUCCESS));
       break;
     case 'REJECTED':
+      $payment->setStatus(new PaymentStatusItem(PAYMENT_STATUS_FAILED));
+      break;
+    case 'CANCELED':
+    case 'REVERSED':
+    case 'REFUNDED':
       $payment->setStatus(new PaymentStatusItem(PAYMENT_STATUS_CANCELLED));
       break;
   }
@@ -271,23 +276,46 @@ function payment_tinkoff_payment_method_configuration_form_elements(array $form,
   $controller = $payment_method->controller;
   $controller_data = $payment_method->controller_data + $controller->controller_data_defaults;
 
-  $elements['TerminalLogin'] = [
-    '#type' => 'textfield',
-    '#title' => t('Terminal login'),
-    '#description' => t('Your Tinkoff terminal login'),
-    '#default_value' => $controller_data['TerminalLogin'],
-    '#required' => true,
+  return [
+    'mode' => [
+      '#type' => 'radios',
+      '#title' => t('Mode'),
+      '#options' => [
+        'test' => t('Test - use for testing payments.'),
+        'live' => t('Live - use for real transactions.'),
+      ],
+      '#default_value' => $controller_data['mode'],
+      '#required' => true,
+    ],
+    'live_terminal_login' => [
+      '#type' => 'textfield',
+      '#title' => t('Live terminal login'),
+      '#description' => t('Your Tinkoff live terminal login.'),
+      '#default_value' => $controller_data['live_terminal_login'],
+      '#required' => false,
+    ],
+    'live_terminal_pass' => [
+      '#type' => 'textfield',
+      '#title' => t('Live terminal password'),
+      '#description' => t('Your Tinkoff live terminal password.'),
+      '#default_value' => $controller_data['live_terminal_pass'],
+      '#required' => false,
+    ],
+    'test_terminal_login' => [
+      '#type' => 'textfield',
+      '#title' => t('Test terminal login'),
+      '#description' => t('Your Tinkoff test terminal login.'),
+      '#default_value' => $controller_data['test_terminal_login'],
+      '#required' => false,
+    ],
+    'test_terminal_pass' => [
+      '#type' => 'textfield',
+      '#title' => t('Test terminal password'),
+      '#description' => t('Your Tinkoff test terminal password.'),
+      '#default_value' => $controller_data['test_terminal_pass'],
+      '#required' => false,
+    ],
   ];
-
-  $elements['TerminalPass'] = [
-    '#type' => 'textfield',
-    '#title' => t('Terminal password'),
-    '#description' => t('Your Tinkoff terminal password'),
-    '#default_value' => $controller_data['TerminalPass'],
-    '#required' => true,
-  ];
-
-  return $elements;
 }
 
 /**
@@ -300,8 +328,11 @@ function payment_tinkoff_payment_method_configuration_form_elements_validate(arr
 {
   $values = drupal_array_get_nested_value($form_state['values'], $element['#parents']);
   $controller_data = &$form_state['payment_method']->controller_data;
-  $controller_data['TerminalLogin'] = $values['TerminalLogin'];
-  $controller_data['TerminalPass'] = $values['TerminalPass'];
+  $controller_data['mode'] = $values['mode'];
+  $controller_data['live_terminal_login'] = $values['live_terminal_login'];
+  $controller_data['live_terminal_pass'] = $values['live_terminal_pass'];
+  $controller_data['test_terminal_login'] = $values['test_terminal_login'];
+  $controller_data['test_terminal_pass'] = $values['test_terminal_pass'];
 }
 
 /**
@@ -312,6 +343,5 @@ function payment_tinkoff_payment_method_configuration_form_elements_validate(arr
  */
 function payment_tinkoff_payment_configuration_form_elements(array $element, array &$form_state)
 {
-  $elements = [];
-  return $elements;
+  return [];
 }

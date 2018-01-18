@@ -18,11 +18,27 @@ function payment_tinkoff_schema()
         'not null' => true,
         'default' => 0,
       ],
-      'TerminalLogin' => [
+      'mode' => [
         'type' => 'varchar',
         'length' => 255,
+        'not null' => true,
       ],
-      'TerminalPass' => [
+      'live_terminal_login' => [
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => true,
+      ],
+      'live_terminal_pass' => [
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => true,
+      ],
+      'test_terminal_login' => [
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => true,
+      ],
+      'test_terminal_pass' => [
         'type' => 'varchar',
         'length' => 255,
         'not null' => true,
