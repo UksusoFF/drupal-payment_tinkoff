@@ -298,6 +298,7 @@ class TinkoffMerchantAPI
         if (is_array($args)) {
             $args = http_build_query($args);
         }
+        watchdog('payment_tinkoff', 'Tinkoff data debug. '. json_encode($args), [], WATCHDOG_WARNING);
         //Debug::trace($args);
         if ($curl = curl_init()) {
             curl_setopt($curl, CURLOPT_URL, $api_url);
@@ -325,6 +326,8 @@ class TinkoffMerchantAPI
             return $out;
 
         } else {
+            watchdog('payment_tinkoff', 'Can not create connection to ' . $api_url . ' with args '
+              . $args, [], WATCHDOG_WARNING);
             throw new HttpException(
                 'Can not create connection to ' . $api_url . ' with args '
                 . $args, 404
