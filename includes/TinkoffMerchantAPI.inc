@@ -264,23 +264,7 @@ class TinkoffMerchantAPI
      */
     private function _combineUrl()
     {
-        $args = func_get_args();
-        watchdog('payment_tinkoff', 'Tinkoff data debug. _combineUrl: '. json_encode($args), [], WATCHDOG_WARNING);
-
-        $url = '';
-        foreach ($args as $arg) {
-            if (is_string($arg)) {
-                if ($arg[strlen($arg) - 1] !== '/') {
-                    $arg .= '/';
-                }
-                $url .= $arg;
-            } else {
-                continue;
-            }
-        }
-
-        watchdog('payment_tinkoff', 'Tinkoff data debug. _combineUrl: '. $url, [], WATCHDOG_WARNING);
-        return $url;
+        return implode('/', func_get_args());
     }
 
     /**
@@ -301,8 +285,6 @@ class TinkoffMerchantAPI
         if (is_array($args)) {
             $args = http_build_query($args);
         }
-        watchdog('payment_tinkoff', 'Tinkoff data debug. '. $api_url, [], WATCHDOG_WARNING);
-        watchdog('payment_tinkoff', 'Tinkoff data debug. '. json_encode($args), [], WATCHDOG_WARNING);
         //Debug::trace($args);
         if ($curl = curl_init()) {
             curl_setopt($curl, CURLOPT_URL, $api_url);
@@ -314,7 +296,7 @@ class TinkoffMerchantAPI
             $out = curl_exec($curl);
 
             $this->_response = $out;
-            watchdog('payment_tinkoff', 'Tinkoff response: ' . $out, [], WATCHDOG_WARNING);
+
             $json = json_decode($out);
             if ($json) {
                 if (@$json->ErrorCode !== "0") {
@@ -331,8 +313,6 @@ class TinkoffMerchantAPI
             return $out;
 
         } else {
-            watchdog('payment_tinkoff', 'Can not create connection to ' . $api_url . ' with args '
-              . $args, [], WATCHDOG_WARNING);
             throw new HttpException(
                 'Can not create connection to ' . $api_url . ' with args '
                 . $args, 404

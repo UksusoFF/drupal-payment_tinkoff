@@ -64,10 +64,14 @@ class TinkoffPaymentController extends PaymentMethodController
 
     $tinkoff = new TinkoffMerchantAPI($settings['TerminalLogin'], $settings['TerminalPass'], self::SERVER_URL);
 
-    $request = json_decode($tinkoff->buildQuery('Init', [
-      'OrderId' => $payment->pid,
-      'Amount' => $payment->totalAmount(true) * 100,
-    ]));
+    try {
+      $request = json_decode($tinkoff->buildQuery('Init', [
+        'OrderId' => $payment->pid,
+        'Amount' => $payment->totalAmount(true) * 100,
+      ]));
+    } catch (\Exception $e) {
+      watchdog('payment_tinkoff', $e->getMessage() , [], WATCHDOG_ERROR);
+    }
 
     return [
       '#action' => $request->PaymentURL,
