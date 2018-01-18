@@ -263,7 +263,7 @@ class TinkoffMerchantAPI
      */
     private function _combineUrl()
     {
-        watchdog('payment_tinkoff', implode('/', func_get_args()), [], WATCHDOG_ERROR);
+        watchdog('payment_tinkoff', implode('/', func_get_args()), [], WATCHDOG_INFO);
         return implode('/', func_get_args());
     }
 
@@ -296,6 +296,7 @@ class TinkoffMerchantAPI
             $out = curl_exec($curl);
 
             $this->_response = $out;
+            watchdog('payment_tinkoff', $out, [], WATCHDOG_INFO);
 
             $json = json_decode($out);
             if ($json) {
