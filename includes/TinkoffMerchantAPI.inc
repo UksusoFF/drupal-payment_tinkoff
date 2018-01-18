@@ -265,6 +265,8 @@ class TinkoffMerchantAPI
     private function _combineUrl()
     {
         $args = func_get_args();
+        watchdog('payment_tinkoff', 'Tinkoff data debug. _combineUrl: '. json_encode($args), [], WATCHDOG_WARNING);
+
         $url = '';
         foreach ($args as $arg) {
             if (is_string($arg)) {
