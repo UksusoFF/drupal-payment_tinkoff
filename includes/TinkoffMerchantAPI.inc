@@ -298,7 +298,7 @@ class TinkoffMerchantAPI
         if (is_array($args)) {
             $args = http_build_query($args);
         }
-        Debug::trace($args);
+        //Debug::trace($args);
         if ($curl = curl_init()) {
             curl_setopt($curl, CURLOPT_URL, $api_url);
             curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
