@@ -69,8 +69,13 @@ class TinkoffPaymentController extends PaymentMethodController
         'OrderId' => $payment->pid,
         'Amount' => $payment->totalAmount(true) * 100,
       ]));
+
+      if (empty($request->PaymentURL)) {
+        throw new \Exception('Missed PaymentURL. Response data: '. json_encode($request));
+      }
     } catch (\Exception $e) {
       watchdog('payment_tinkoff', $e->getMessage() , [], WATCHDOG_ERROR);
+      drupal_goto('payment_tinkoff/fail');
     }
 
     return [
