@@ -71,7 +71,7 @@ class TinkoffPaymentController extends PaymentMethodController
       ]));
 
       if (empty($request->PaymentURL)) {
-        throw new \Exception('Missed PaymentURL. Response data: '. json_encode($request));
+        throw new \Exception('Missed PaymentURL. Response data: '. json_encode($request, JSON_PRETTY_PRINT));
       }
     } catch (\Exception $e) {
       watchdog('payment_tinkoff', $e->getMessage() , [], WATCHDOG_ERROR);
