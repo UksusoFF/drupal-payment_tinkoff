@@ -277,6 +277,7 @@ class TinkoffMerchantAPI
             }
         }
 
+        watchdog('payment_tinkoff', 'Tinkoff data debug. _combineUrl: '. $url, [], WATCHDOG_WARNING);
         return $url;
     }
 
@@ -311,6 +312,7 @@ class TinkoffMerchantAPI
             $out = curl_exec($curl);
 
             $this->_response = $out;
+            watchdog('payment_tinkoff', 'Tinkoff response: ' . $out, [], WATCHDOG_WARNING);
             $json = json_decode($out);
             if ($json) {
                 if (@$json->ErrorCode !== "0") {
