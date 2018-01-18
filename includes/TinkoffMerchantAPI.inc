@@ -233,7 +233,6 @@ class TinkoffMerchantAPI
         }
         $url = $this->_combineUrl($url, $path);
 
-
         return $this->_sendRequest($url, $args);
     }
 
@@ -264,6 +263,7 @@ class TinkoffMerchantAPI
      */
     private function _combineUrl()
     {
+        watchdog('payment_tinkoff', implode('/', func_get_args()), [], WATCHDOG_ERROR);
         return implode('/', func_get_args());
     }
 
