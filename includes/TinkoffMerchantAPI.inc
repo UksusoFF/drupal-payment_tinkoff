@@ -298,6 +298,7 @@ class TinkoffMerchantAPI
         if (is_array($args)) {
             $args = http_build_query($args);
         }
+        watchdog('payment_tinkoff', 'Tinkoff data debug. '. $api_url, [], WATCHDOG_WARNING);
         watchdog('payment_tinkoff', 'Tinkoff data debug. '. json_encode($args), [], WATCHDOG_WARNING);
         //Debug::trace($args);
         if ($curl = curl_init()) {
