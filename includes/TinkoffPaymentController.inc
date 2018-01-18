@@ -5,7 +5,7 @@ class TinkoffPaymentController extends PaymentMethodController
   /**
    * Tinkoff server payment URL.
    */
-  const SERVER_URL = 'https://securepay.tinkoff.ru/rest/';
+  const SERVER_URL = 'https://securepay.tinkoff.ru/rest';
 
   /**
    * Default controller data.
