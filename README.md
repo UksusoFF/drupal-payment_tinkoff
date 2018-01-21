@@ -27,3 +27,5 @@ You will get "Terminal key", "Password" and other settings for your payment syst
 * Default Fail URL: https://yoursitename.com/payment_tinkoff/fail
 
 More API documentation can be found at [Tinkoff API](https://oplata.tinkoff.ru/landing/develop/documentation).
+
+You can theming result pages: page--payment-tinkoff--success.tpl.php and  page--payment-tinkoff--fail.tpl.php
