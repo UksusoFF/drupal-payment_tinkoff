@@ -66,8 +66,8 @@ class TinkoffPaymentController extends PaymentMethodController
     $settings = $payment->method->controller_data;
 
     $tinkoff = new TinkoffMerchantAPI(
-      $settings['mode'] === 'test' ? $settings['test_terminal_login'] : $settings['live_terminal_login'],
-      $settings['mode'] === 'test' ? $settings['test_terminal_pass'] : $settings['live_terminal_pass'],
+      trim($settings[$settings['mode'] === 'test' ? 'test_terminal_login' : 'live_terminal_login']),
+      trim($settings[$settings['mode'] === 'test' ? 'test_terminal_pass' : 'live_terminal_pass']),
       self::SERVER_URL
     );
 
