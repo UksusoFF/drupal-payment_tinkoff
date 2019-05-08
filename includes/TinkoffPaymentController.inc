@@ -147,8 +147,8 @@ class TinkoffPaymentController extends PaymentMethodController
 
     $settings = $payment->method->controller_data;
     if (
-      empty($settings['mode'] === 'test' ? $settings['test_terminal_login'] : $settings['live_terminal_login']) ||
-      empty($settings['mode'] === 'test' ? $settings['test_terminal_pass'] : $settings['live_terminal_pass'])
+      empty(trim($settings[$settings['mode'] === 'test' ? 'test_terminal_login' : 'live_terminal_login'])) ||
+      empty(trim($settings[$settings['mode'] === 'test' ? 'test_terminal_pass' : 'live_terminal_pass']))
     ) {
       watchdog('payment_tinkoff !data', 'Wrong terminal settings. POST data: <pre>!data</pre> <pre>!settings</pre>', [
         '!settings' => print_r($settings, true),
@@ -165,7 +165,7 @@ class TinkoffPaymentController extends PaymentMethodController
     }
 
     $token_data = array_merge($data, [
-      'Password' => $settings['mode'] === 'test' ? $settings['test_terminal_pass'] : $settings['live_terminal_pass'],
+      'Password' => trim($settings[$settings['mode'] === 'test' ? 'test_terminal_pass' : 'live_terminal_pass']),
     ]);
     ksort($token_data);
     unset($token_data['Token']);
