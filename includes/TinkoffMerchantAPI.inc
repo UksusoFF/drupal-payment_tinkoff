@@ -1,7 +1,6 @@
 <?php
 /**
  * File TinkoffMerchantAPI
- *
  * PHP version 5.3
  *
  * @category Tinkoff
@@ -22,8 +21,8 @@
  * @author   Shuyskiy Sergey <s.shuyskiy@tinkoff.ru>
  * @license  http://opensource.org/licenses/MIT MIT license
  * @link     http://tinkoff.ru
- * @property integer     orderId
- * @property integer     Count
+ * @property integer orderId
+ * @property integer Count
  * @property bool|string error
  * @property bool|string response
  * @property bool|string customerKey
@@ -34,12 +33,19 @@
 class TinkoffMerchantAPI
 {
     private $_api_url;
+
     private $_terminalKey;
+
     private $_secretKey;
+
     private $_paymentId;
+
     private $_status;
+
     private $_error;
+
     private $_response;
+
     private $_paymentUrl;
 
     /**
@@ -66,28 +72,28 @@ class TinkoffMerchantAPI
     public function __get($name)
     {
         switch ($name) {
-        case 'paymentId':
-            return $this->_paymentId;
-        case 'status':
-            return $this->_status;
-        case 'error':
-            return $this->_error;
-        case 'paymentUrl':
-            return $this->_paymentUrl;
-        case 'response':
-            return htmlentities($this->_response);
-        default:
-            if ($this->_response) {
-                if ($json = json_decode($this->_response, true)) {
-                    foreach ($json as $key => $value) {
-                        if (strtolower($name) == strtolower($key)) {
-                            return $json[$key];
+            case 'paymentId':
+                return $this->_paymentId;
+            case 'status':
+                return $this->_status;
+            case 'error':
+                return $this->_error;
+            case 'paymentUrl':
+                return $this->_paymentUrl;
+            case 'response':
+                return htmlentities($this->_response);
+            default:
+                if ($this->_response) {
+                    if ($json = json_decode($this->_response, true)) {
+                        foreach ($json as $key => $value) {
+                            if (strtolower($name) == strtolower($key)) {
+                                return $json[$key];
+                            }
                         }
                     }
                 }
-            }
 
-            return false;
+                return false;
         }
     }
 
@@ -207,7 +213,7 @@ class TinkoffMerchantAPI
      */
     public function resend()
     {
-        return $this->buildQuery('Resend', array());
+        return $this->buildQuery('Resend', []);
     }
 
     /**
@@ -215,7 +221,7 @@ class TinkoffMerchantAPI
      * Could be used to custom API call method.
      *
      * @param string $path API method name
-     * @param mixed  $args query params
+     * @param mixed $args  query params
      *
      * @return mixed
      * @throws HttpException
@@ -224,10 +230,10 @@ class TinkoffMerchantAPI
     {
         $url = $this->_api_url;
         if (is_array($args)) {
-            if (! array_key_exists('TerminalKey', $args)) {
+            if (!array_key_exists('TerminalKey', $args)) {
                 $args['TerminalKey'] = $this->_terminalKey;
             }
-            if (! array_key_exists('Token', $args)) {
+            if (!array_key_exists('Token', $args)) {
                 $args['Token'] = $this->_genToken($args);
             }
         }
@@ -270,7 +276,7 @@ class TinkoffMerchantAPI
      * Main method. Call API with params
      *
      * @param string $api_url API Url
-     * @param array  $args    API params
+     * @param array $args     API params
      *
      * @return mixed
      * @throws HttpException
@@ -310,7 +316,6 @@ class TinkoffMerchantAPI
             curl_close($curl);
 
             return $out;
-
         } else {
             throw new HttpException(
                 'Can not create connection to ' . $api_url . ' with args '
