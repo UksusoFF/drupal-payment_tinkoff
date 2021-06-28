@@ -46,6 +46,26 @@ function payment_tinkoff_menu()
   return $items;
 }
 
+function payment_tinkoff_theme()
+{
+  return [
+    'payment_tinkoff_success' => [
+      'template' => 'payment_tinkoff_success',
+      'variables' => [
+        'message' => null,
+      ],
+      'path' => drupal_get_path('module', 'payment_tinkoff') . '/templates'
+    ],
+    'payment_tinkoff_fail' => [
+      'template' => 'payment_tinkoff_fail',
+      'variables' => [
+        'message' => null,
+      ],
+      'path' => drupal_get_path('module', 'payment_tinkoff') . '/templates'
+    ],
+  ];
+}
+
 /**
  * Return page callback for success payment status.
  */
@@ -60,7 +80,9 @@ function payment_tinkoff_success_callback()
     drupal_goto(current_path());
   }
 
-  return t('Thank you! Your payment was successful.');
+  return theme('payment_tinkoff_success', [
+    'message' => t('Thank you! Your payment was successful.'),
+  ]);
 }
 
 /**
@@ -72,8 +94,10 @@ function payment_tinkoff_fail_callback()
     drupal_goto(current_path());
   }
 
-  return t('Your payment was not successful. Please <a href="/cart">try again</a> or contact us at <a href="mailto:!email">!email</a>.', [
-    '!email' => variable_get('site_mail'),
+  return theme('payment_tinkoff_fail', [
+    'message' => t('Your payment was not successful. Please <a href="/cart">try again</a> or contact us at <a href="mailto:!email">!email</a>.', [
+      '!email' => variable_get('site_mail'),
+    ]),
   ]);
 }
 
@@ -82,13 +106,15 @@ function payment_tinkoff_fail_callback()
  */
 function payment_tinkoff_process_callback()
 {
-  $post_data = $_POST;
+  $source = file_get_contents("php://input");
+  $post_data = json_decode($source, true);
 
   if (!TinkoffPaymentController::validatePost($post_data)) {
     print 'bad data';
     drupal_exit();
   }
 
+  /** @var \Payment $payment */
   $payment = entity_load_single('payment', $post_data['OrderId']);
 
   switch ($post_data['Status']) {
@@ -140,6 +166,7 @@ function payment_tinkoff_form_redirect(array $form, array &$form_state, Payment 
     '#type' => 'markup',
     '#markup' => '<p>' . t('You will be redirected to the off-site payment server to authorize the payment.') . '</p>',
   ];
+
   return $form;
 }
 
@@ -157,6 +184,7 @@ function _payment_tinkoff_clean_form(array $form)
   unset($form['form_token']);
   unset($form['form_build_id']);
   unset($form['form_id']);
+
   return $form;
 }
 
@@ -178,6 +206,7 @@ function payment_tinkoff_form_redirect_access(Payment $payment, $account = null)
     global $user;
     $account = $user;
   }
+
   return $account->uid == $payment->uid &&
     is_a($payment->method->controller, 'TinkoffPaymentController')
     && payment_status_is_or_has_ancestor($payment->getStatus()->status, PAYMENT_STATUS_PENDING);

@@ -1,26 +1,8 @@
 <?php
-/**
- * File TinkoffMerchantAPI
- * PHP version 5.3
- *
- * @category Tinkoff
- * @package  Tinkoff
- * @author   Shuyskiy Sergey <s.shuyskiy@tinkoff.ru>
- * @license  http://opensource.org/licenses/MIT MIT license
- * @link     http://tinkoff.ru
- */
-//namespace Tinkoff;
-
-//use HttpException;
 
 /**
  * Class TinkoffMerchantAPI
  *
- * @category Tinkoff
- * @package  Tinkoff
- * @author   Shuyskiy Sergey <s.shuyskiy@tinkoff.ru>
- * @license  http://opensource.org/licenses/MIT MIT license
- * @link     http://tinkoff.ru
  * @property integer orderId
  * @property integer Count
  * @property bool|string error
@@ -53,11 +35,10 @@ class TinkoffMerchantAPI
      *
      * @param string $terminalKey Your Terminal name
      * @param string $secretKey   Secret key for terminal
-     * @param string $api_url     Url for API
      */
-    public function __construct($terminalKey, $secretKey, $api_url)
+    public function __construct($terminalKey, $secretKey)
     {
-        $this->_api_url = $api_url;
+        $this->_api_url = 'https://securepay.tinkoff.ru/v2';
         $this->_terminalKey = $terminalKey;
         $this->_secretKey = $secretKey;
     }
@@ -269,7 +250,20 @@ class TinkoffMerchantAPI
      */
     private function _combineUrl()
     {
-        return implode('/', func_get_args());
+        $args = func_get_args();
+        $url = '';
+        foreach ($args as $arg) {
+            if (is_string($arg)) {
+                if ($arg[strlen($arg) - 1] !== '/') {
+                    $arg .= '/';
+                }
+                $url .= $arg;
+            } else {
+                continue;
+            }
+        }
+
+        return $url;
     }
 
     /**
@@ -288,9 +282,9 @@ class TinkoffMerchantAPI
         //$proxy = 'http://192.168.5.22:8080';
         //$proxyAuth = '';
         if (is_array($args)) {
-            $args = http_build_query($args);
+            $args = json_encode($args);
         }
-        //Debug::trace($args);
+
         if ($curl = curl_init()) {
             curl_setopt($curl, CURLOPT_URL, $api_url);
             curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
@@ -298,6 +292,9 @@ class TinkoffMerchantAPI
             curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
             curl_setopt($curl, CURLOPT_POST, true);
             curl_setopt($curl, CURLOPT_POSTFIELDS, $args);
+            curl_setopt($curl, CURLOPT_HTTPHEADER, [
+                'Content-Type: application/json',
+            ]);
             $out = curl_exec($curl);
 
             $this->_response = $out;

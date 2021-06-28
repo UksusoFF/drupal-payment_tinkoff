@@ -1,7 +1,7 @@
 # Drupal Payment Tinkoff
 ![Drupal Payment Tinkoff](https://img.shields.io/badge/Drupal-7.x-blue.svg)
 
-This module provide integration [Tinkoff](https://oplata.tinkoff.ru/) payments for using with Drupal Ubercart / Commerce through [Payment](https://www.drupal.org/project/payment) (7.x-1.x version) module.
+This module provide integration [Tinkoff](https://oplata.tinkoff.ru/) payments for using with Drupal Ubercart through [Payment](https://www.drupal.org/project/payment) (7.x-1.x version) module.
 
 Module based on [Robokassa Payment](https://www.drupal.org/project/robokassa_payment) integration and [Tinkoff Ubercart](https://oplata.tinkoff.ru/landing/develop/cms/ubercart) modules.
 
