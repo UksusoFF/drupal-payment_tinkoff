@@ -117,6 +117,12 @@ class TinkoffPaymentController extends PaymentMethodController
         'Items' => $items,
       ];
 
+      watchdog('payment_tinkoff', 'Query for Payment Form: <pre>!data</pre>', [
+        '!data' => json_encode($query, JSON_UNESCAPED_UNICODE),
+      ], WATCHDOG_DEBUG);
+
+      $query['Token'] = self::genToken($settings, $query);
+
       $request = json_decode($tinkoff->init($query), false);
 
       if (empty($request->PaymentURL)) {
@@ -161,7 +167,7 @@ class TinkoffPaymentController extends PaymentMethodController
     ]), $data);
     if (!empty($unavailable_required_keys)) {
       watchdog('payment_tinkoff', 'Missing POST keys. POST data: <pre>!data</pre>', [
-        '!data' => print_r($unavailable_required_keys, true),
+        '!data' => json_encode($unavailable_required_keys, JSON_UNESCAPED_UNICODE),
       ], WATCHDOG_WARNING);
 
       return false;
@@ -176,7 +182,7 @@ class TinkoffPaymentController extends PaymentMethodController
       'REFUNDED',
     ])) {
       watchdog('payment_tinkoff', 'Wrong payment status. POST data: <pre>!data</pre>', [
-        '!data' => print_r($data, true),
+        '!data' => json_encode($data, JSON_UNESCAPED_UNICODE),
       ], WATCHDOG_WARNING);
 
       return false;
@@ -185,7 +191,7 @@ class TinkoffPaymentController extends PaymentMethodController
     $payment = entity_load_single('payment', $data['OrderId']);
     if (!$payment) {
       watchdog('payment_tinkoff', 'Missing payment ID. POST data: !data', [
-        '!data' => print_r($data, true),
+        '!data' => json_encode($data, JSON_UNESCAPED_UNICODE),
       ], WATCHDOG_WARNING);
 
       return false;
@@ -197,8 +203,8 @@ class TinkoffPaymentController extends PaymentMethodController
       empty(trim($settings[$settings['mode'] === 'test' ? 'test_terminal_pass' : 'live_terminal_pass']))
     ) {
       watchdog('payment_tinkoff !data', 'Wrong terminal settings. POST data: <pre>!data</pre> <pre>!settings</pre>', [
-        '!settings' => print_r($settings, true),
-        '!data' => print_r($data, true),
+        '!settings' => json_encode($settings, JSON_UNESCAPED_UNICODE),
+        '!data' => json_encode($data, JSON_UNESCAPED_UNICODE),
       ], WATCHDOG_WARNING);
 
       return false;
@@ -206,7 +212,7 @@ class TinkoffPaymentController extends PaymentMethodController
 
     if ($payment->totalAmount(true) != ((int)$data['Amount'] / 100)) {
       watchdog('payment_tinkoff', 'Wrong payment amount. POST data: !data', [
-        '!data' => print_r($data, true),
+        '!data' => json_encode($data, JSON_UNESCAPED_UNICODE),
       ], WATCHDOG_WARNING);
 
       return false;
@@ -214,7 +220,7 @@ class TinkoffPaymentController extends PaymentMethodController
 
     if ($data['Token'] !== self::genToken($settings, $data)) {
       watchdog('payment_tinkoff', 'Wrong payment token. POST data: !data', [
-        '!data' => print_r($data, true),
+        '!data' => json_encode($data, JSON_UNESCAPED_UNICODE),
       ], WATCHDOG_WARNING);
 
       return false;
