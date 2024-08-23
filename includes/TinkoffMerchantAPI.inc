@@ -232,12 +232,22 @@ class TinkoffMerchantAPI
      */
     private function _genToken($args)
     {
+        if (isset($args['DATA'])) {
+            unset($args['DATA']);
+        }
+        if (isset($args['Receipt'])) {
+            unset($args['Receipt']);
+        }
+        if (isset($args['Token'])) {
+            unset($args['Token']);
+        }
         $token = '';
         $args['Password'] = $this->_secretKey;
         ksort($args);
         foreach ($args as $arg) {
             $token .= $arg;
         }
+
         $token = hash('sha256', $token);
 
         return $token;

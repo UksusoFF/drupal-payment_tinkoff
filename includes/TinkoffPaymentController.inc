@@ -117,16 +117,13 @@ class TinkoffPaymentController extends PaymentMethodController
         'Items' => $items,
       ];
 
-      watchdog('payment_tinkoff', 'Query for Payment Form: <pre>!data</pre>', [
-        '!data' => json_encode($query, JSON_UNESCAPED_UNICODE),
-      ], WATCHDOG_DEBUG);
-
-      $query['Token'] = self::genToken($settings, $query);
-
       $request = json_decode($tinkoff->init($query), false);
 
       if (empty($request->PaymentURL)) {
-        throw new \Exception('Missed PaymentURL. Response data: ' . json_encode($request, JSON_PRETTY_PRINT));
+        watchdog('payment_tinkoff', 'Missing PaymentURL. Response data: <pre>!data</pre>', [
+          '!data' => json_encode($request, JSON_UNESCAPED_UNICODE),
+        ], WATCHDOG_WARNING);
+        throw new \Exception('Missed PaymentURL');
       }
     } catch (\Exception $e) {
       watchdog('payment_tinkoff', $e->getMessage(), [], WATCHDOG_ERROR);
