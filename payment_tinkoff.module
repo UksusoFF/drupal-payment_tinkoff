@@ -161,6 +161,7 @@ function payment_tinkoff_form_redirect(array $form, array &$form_state, Payment 
   ];
   $form['#prefix'] = '<div class="payment-tinkoff-redirect-form">';
   $form['#suffix'] = '</div>';
+  $form['#method'] = 'GET';
   $form['#pre_render'][] = '_payment_tinkoff_clean_form';
   $form['message'] = [
     '#type' => 'markup',
