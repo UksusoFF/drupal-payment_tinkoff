@@ -69,6 +69,20 @@ class TinkoffPaymentController extends PaymentMethodController
       payment_ubercart_order_id_load($payment);
       $order = uc_order_load($payment->payment_ubercart_uc_order_id);
 
+      $coupons = array_filter($order->line_items, function (array $item) {
+        return !empty($item['type']) && $item['type'] === 'coupon';
+      });
+
+      $coupon = !empty($coupons) && !empty($coupons[0]['data']['code'])
+        ? uc_custom_coupon_load($coupons[0]['data']['code'])
+        : null;
+
+      $discount = !empty($coupon) && $coupon->type === 'percentage' ? (1 - ($coupon->value / 100)) : 1;
+
+      if (!empty($coupon) && $coupon->type !== 'percentage') {
+        throw new Exception('Unsupported coupon type');
+      }
+
       $nalog_system = null;
 
       foreach ($order->products as $product) {
@@ -96,7 +110,13 @@ class TinkoffPaymentController extends PaymentMethodController
       $items = [];
 
       foreach ($payment->getLineItems() as $item) {
-        $price = $item->unitAmount(true);
+        $price = $item->unitAmount(true) * $discount;
+
+        if ($price < 0) {
+          // Исключаем примененные скидки.
+          continue;
+        }
+
         $name = trim(preg_replace("/&?[a-z0-9]+;/i", "", htmlspecialchars($item->description)));
         $quantity = round($item->quantity);
 
