@@ -94,6 +94,7 @@ class TinkoffPaymentController extends PaymentMethodController
       ];
 
       $items = [];
+
       foreach ($payment->getLineItems() as $item) {
         $price = $item->unitAmount(true);
         $name = trim(preg_replace("/&?[a-z0-9]+;/i", "", htmlspecialchars($item->description)));
@@ -104,7 +105,7 @@ class TinkoffPaymentController extends PaymentMethodController
           'Price' => round($price * 100),
           'Quantity' => $quantity,
           'Amount' => round($price * $quantity * 100),
-          'PaymentMethod' => 'full_payment ',
+          'PaymentMethod' => 'full_payment',
           'PaymentObject' => 'service',
           'Tax' => 'none',
         ];

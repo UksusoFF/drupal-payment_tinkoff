@@ -3,7 +3,7 @@
 
 This module provide integration [Tinkoff](https://oplata.tinkoff.ru/) payments for using with Drupal Ubercart through [Payment](https://www.drupal.org/project/payment) (7.x-1.x version) module.
 
-Module based on [Robokassa Payment](https://www.drupal.org/project/robokassa_payment) integration and [Tinkoff Ubercart](https://oplata.tinkoff.ru/landing/develop/cms/ubercart) modules.
+Module based on [Robokassa Payment](https://www.drupal.org/project/robokassa_payment) integration and [Tinkoff Ubercart](https://developer.tbank.ru/eacq/modules) modules.
 
 **Tested on Ubercart only.** If you have any questions feel free to [create new issue](https://github.com/UksusoFF/drupal-payment_tinkoff/issues/new).
 
@@ -26,6 +26,6 @@ You will get "Terminal key", "Password" and other settings for your payment syst
 * Default Success URL: https://yoursitename.com/payment_tinkoff/success
 * Default Fail URL: https://yoursitename.com/payment_tinkoff/fail
 
-More API documentation can be found at [Tinkoff API](https://oplata.tinkoff.ru/landing/develop/documentation).
+More API documentation can be found at [Tinkoff API](https://developer.tbank.ru/eacq/api/init).
 
 You can theming result pages: `page--payment-tinkoff--success.tpl.php` and `page--payment-tinkoff--fail.tpl.php`
